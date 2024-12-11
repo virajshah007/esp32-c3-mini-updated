@@ -1,6 +1,9 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
+#include <Arduino.h>
+#include <lvgl.h>
+
 #ifdef NO_WATCHFACES
 
 
@@ -49,6 +52,19 @@
 
 #define ENABLE_APP_NAVIGATION
 #define ENABLE_APP_CONTACTS
+
+// Adding MAX30102 Integration
+#define ENABLE_APP_MAX30102 // Enable MAX30102 application and sensor support
+
+#ifdef ENABLE_APP_MAX30102
+#include <DFRobot_MAX30102.h>
+extern DFRobot_MAX30102 particleSensor; // Declare the MAX30102 sensor object
+
+// Function prototypes for MAX30102 integration
+void readSensorData();    // Reads data from the MAX30102 sensor
+void updateSensorGUI();   // Updates the GUI with MAX30102 sensor data
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
