@@ -41,6 +41,13 @@
 #include "misc/lv_event_private.h"
 #include <string.h>
 
+#include <lvgl.h>
+#include "app_hal.h"
+#include "ui/ui.h"
+#include "common/api.h"
+lv_obj_t *ui_heartRateLabel;
+lv_obj_t *ui_spo2Label;
+
 #define UI_VERSION "5.1"
 
 const char *ui_info_text = "v" UI_VERSION " [fbiego]";
@@ -4040,6 +4047,24 @@ void init_custom_face()
 
 void ui_init(void)
 {
+      
+      // Initialize Heart Rate Display
+      ui_heartRateLabel = lv_label_create(lv_scr_act());
+      lv_label_set_text(ui_heartRateLabel, "Heart Rate: -- bpm");
+      lv_obj_align(ui_heartRateLabel, LV_ALIGN_TOP_LEFT, 10, 10);
+      lv_obj_set_style_text_font(ui_heartRateLabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+      // Initialize SpO2 Display
+      ui_spo2Label = lv_label_create(lv_scr_act());
+      lv_label_set_text(ui_spo2Label, "SpO2: --%");
+      lv_obj_align(ui_spo2Label, LV_ALIGN_TOP_LEFT, 10, 40);
+      lv_obj_set_style_text_font(ui_spo2Label, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+      // Existing UI loading logic
+      lv_scr_load(lv_scr_act()); 
+    
+    
+    
       lv_disp_t *dispp = lv_disp_get_default();
       lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, LV_FONT_DEFAULT);
       lv_disp_set_theme(dispp, theme);
