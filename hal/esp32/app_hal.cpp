@@ -54,6 +54,11 @@
 #include "FS.h"
 #include "FFat.h"
 
+#ifdef ENABLE_APP_MAX30102
+#include <DFRobot_MAX30102.h>
+extern DFRobot_MAX30102 particleSensor; // Declare the global sensor instance
+#endif
+
 #ifdef ENABLE_APP_QMI8658C
 #include "FastIMU.h"
 #define QMI_ADDRESS 0x6B
@@ -1696,6 +1701,15 @@ void hal_setup()
 
   int rt = prefs.getInt("rotate", 0);
 
+#ifdef ENABLE_APP_MAX30102
+    if (!particleSensor.begin(Wire, I2C_SPEED_STANDARD)) {
+        Serial.println("MAX30102 initialization failed.");
+    } else {
+        Serial.println("MAX30102 initialized successfully.");
+    }
+#endif
+
+
 #ifdef ELECROW_C3
   Wire.begin(4, 5);
   init_IO_extender();
@@ -1937,6 +1951,28 @@ void hal_loop()
 
   if (!transfer)
   {
+
+    lv_timer_handler();
+    delay(5);
+#ifdef ENABLE_APP_MAX30102
+    // Read MAX30102 sensor data
+   if (particleSensor.check()) 
+    {
+        Serial.print("Heart Rate: ");
+        Serial.print(particleSensor.getHeartRate());
+        Serial.print(" SpO2: ");
+        Serial.println(particleSensor.getSpO2());
+
+        // Update GUI dynamically
+        lv_label_set_text_fmt(ui_heartRateLabel, "Heart Rate: %d bpm", particleSensor.getHeartRate());
+        lv_label_set_text_fmt(ui_spo2Label, "SpO2: %d%%", particleSensor.getSpO2());
+    } 
+    else 
+    {
+        Serial.println("MAX30102 sensor not ready");
+    }
+#endif
+
     lv_timer_handler(); // Update the UI-
     delay(5);
 
